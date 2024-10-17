@@ -1,23 +1,35 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export default function App(){
+export default function App() {
   const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch("http://localhost:3000/")
-    .then(response => {
-      if(!response.ok) {
-        throw new Error('Network response was not ok');
+  const [name, setName] = useState('')
+    
+  async function sendName(){
+    const res = await fetch("http://localhost:3000/post", {
+      method: 'POST',
+      body: JSON.stringify({
+        name: message
+      }),
+      headers: {
+        'Content-Type': 'application/json'
       }
-      return response.json()
     })
-    .then(data => setMessage(data.message))
-    .catch(err => console.log('Error: ',err))
-  }, [])
+    const data = await res.json();
+    setName(data.message);
+  }
 
   return (
     <div>
-      <h1>{message}</h1>
+      <label>
+        <input 
+          id="message"
+          type="text"
+          placeholder="Joe"
+          onChange={(e) => setMessage(e.target.value)}
+        />
+      </label>
+      <button onClick={sendName}>send</button>
+      <h3 className="name">{name}</h3>
     </div>
   );
 }
