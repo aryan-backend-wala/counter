@@ -1,35 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function App() {
-  const [message, setMessage] = useState('');
-  const [name, setName] = useState('')
-    
-  async function sendName(){
-    const res = await fetch("http://localhost:3000/post", {
-      method: 'POST',
-      body: JSON.stringify({
-        name: message
-      }),
-      headers: {
-        'Content-Type': 'application/json'
+  const [counter, setCounter] = useState(0);
+  
+  useEffect(() => {
+    async function fetchCounter(){
+      try{
+        const res = await fetch("http://localhost:3000/counter")
+        const data = await res.json()
+        setCounter(data.counter)
+      } catch(err) {
+        console.error('Error fetching counter: ', err)
       }
-    })
-    const data = await res.json();
-    setName(data.message);
+    }
+    fetchCounter()
+  }, [])
+
+  async function deInc(action){
+    try {
+      const res = await fetch("http://localhost:3000/counter/action", {
+        method: 'POST',
+        body: JSON.stringify({
+          countFlag: action
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      if(!res.ok) throw new Error('Failed to update counter');
+      const data = await res.json()
+      setCounter(data.counter);
+    } catch (err) {
+      console.error('Error: ', err)
+      alert('Something went wrong!')
+    }
   }
+
+  const INCREMENT = 1;
+  const DECREMENT = 0;
 
   return (
     <div>
-      <label>
-        <input 
-          id="message"
-          type="text"
-          placeholder="Joe"
-          onChange={(e) => setMessage(e.target.value)}
-        />
-      </label>
-      <button onClick={sendName}>send</button>
-      <h3 className="name">{name}</h3>
+      <h1>{counter}</h1>
+      <button onClick={() => deInc(INCREMENT)}>Increment</button>
+      <button onClick={() => deInc(DECREMENT)}>Decrement</button>
     </div>
   );
 }
