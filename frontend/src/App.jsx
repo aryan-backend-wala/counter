@@ -10,7 +10,7 @@ export default function App() {
   useEffect(() => {
     async function fetchCounter(){
       try{
-        const res = await fetch("http://localhost:3000/counter")
+        const res = await fetch("/api/counter")
         const data = await res.json()
         setCounter(data.counter)
       } catch(err) {
@@ -23,7 +23,7 @@ export default function App() {
   }, [token])
 
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:3000/login", {
+    const res = await fetch("/api/counter/login", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -33,7 +33,6 @@ export default function App() {
     if(res.ok) {
       localStorage.setItem('token', data.token)
       setToken(data.token)
-      alert(msg.message)
     } else {
       alert(data.message)
     }
@@ -41,7 +40,7 @@ export default function App() {
 
   async function deInc(action){
     try {
-      const res = await fetch(`http://localhost:3000/counter/${action}`, {
+      const res = await fetch(`/api/counter/${action}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`

@@ -1,21 +1,32 @@
-const express = require('express')
-const cors = require("cors")
-const jwt = require("jsonwebtoken")
-const app = express();
+import express from "express";
+import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+import path from "path";
 
-const port = 3000
+const app = express();
+dotenv.config();
+
+const PORT = process.env.PORT || 5000
 const secretKey = 'your-secret-key';
 
-app.use(cors({ origin: 'http://localhost:5173'}))
 app.use(express.json())
+const __dirname = path.resolve();
+
+if(process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, "/frontend/dist")))
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  })
+}
 
 let counter = 0;
 
-app.get('/counter', (req, res) => {
+app.get('/api/counter', (req, res) => {
   res.json({ counter })
 })
 
-app.post('/login', (req, res) => {
+app.post('/api/counter/login', (req, res) => {
   const { username, password } = req.body;
   if(username === 'admin' && password === "1234") {
     const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
@@ -25,7 +36,7 @@ app.post('/login', (req, res) => {
   }
 })
 
-app.post('/counter/:action', (req, res) => {
+app.post('/api/counter/:action', (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -51,6 +62,6 @@ app.post('/counter/:action', (req, res) => {
 })
 
 
-app.listen(port, () => {
-  console.log(`Server is running on ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on ${PORT}`);
 })
