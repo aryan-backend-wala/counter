@@ -12,12 +12,6 @@ const secretKey = 'your-secret-key';
 app.use(express.json())
 const __dirname = path.resolve();
 
-if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "/frontend/dist")));
-	app.get("*", (req, res) => {
-		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-	});
-} 
 
 let counter = 0;
 
@@ -38,11 +32,11 @@ app.post('/api/counter/login', (req, res) => {
 app.post('/api/counter/:action', (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
-
+  
   if(!token) {
     return res.status(401).json({ message: 'Token missing' });
   }
-
+  
   jwt.verify(token, secretKey, (err, user) => {
     if(err) {
       return res.status(403).json({ message: "Invalid Token" });
@@ -57,9 +51,15 @@ app.post('/api/counter/:action', (req, res) => {
     }
     res.json({ message: `${action} Successful`, counter })
   })
-
+  
 })
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+} 
 
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);

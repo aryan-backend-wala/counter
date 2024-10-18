@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 export default function App() {
   const [counter, setCounter] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(localStorage.getItem('token') || '');
