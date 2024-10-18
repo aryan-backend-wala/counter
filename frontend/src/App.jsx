@@ -16,7 +16,9 @@ export default function App() {
         console.error('Error fetching counter: ', err)
       }
     }
-    if(isLoggedIn) {
+    const storedUser = sessionStorage.getItem('username');
+    if(storedUser) {
+      setIsLoggedIn(true)
       fetchCounter()
     }
   }, [isLoggedIn])
@@ -30,7 +32,10 @@ export default function App() {
     
     const msg = await res.json();
     if(res.ok) {
+      sessionStorage.setItem('username', username);
+      sessionStorage.setItem('password', password);
       setIsLoggedIn(true)
+      alert(msg.message)
     } else {
       alert(msg.message)
     }
@@ -50,6 +55,11 @@ export default function App() {
     }
   }
 
+  function handleLogout() {
+    sessionStorage.clear()
+    setIsLoggedIn(false)
+  }
+
   const INCREMENT = 'increment';
   const DECREMENT = 'decrement';
 
@@ -65,10 +75,14 @@ export default function App() {
   }
 
   return (
-    <div>
-      <h1>{counter}</h1>
+    <div>   
+      <h1>Welcome, {sessionStorage.getItem('username')}!</h1>
+      <h2>{counter}</h2>
       <button onClick={() => deInc(INCREMENT)}>Increment</button>
       <button onClick={() => deInc(DECREMENT)}>Decrement</button>
+      <br />
+      <br />
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 }
