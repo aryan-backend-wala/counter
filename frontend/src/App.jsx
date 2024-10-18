@@ -5,6 +5,7 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [token, setToken] = useState(localStorage.getItem('token') || '');
 
   useEffect(() => {
     async function fetchCounter(){
@@ -16,12 +17,10 @@ export default function App() {
         console.error('Error fetching counter: ', err)
       }
     }
-    const storedUser = sessionStorage.getItem('username');
-    if(storedUser) {
-      setIsLoggedIn(true)
+    if(token) {
       fetchCounter()
     }
-  }, [isLoggedIn])
+  }, [token])
 
   const handleLogin = async () => {
     const res = await fetch("http://localhost:3000/login", {
@@ -30,21 +29,23 @@ export default function App() {
       body: JSON.stringify({ username, password })
     })
     
-    const msg = await res.json();
+    const data = await res.json();
     if(res.ok) {
-      sessionStorage.setItem('username', username);
-      sessionStorage.setItem('password', password);
-      setIsLoggedIn(true)
+      localStorage.setItem('token', data.token)
+      setToken(data.token)
       alert(msg.message)
     } else {
-      alert(msg.message)
+      alert(data.message)
     }
   }
 
   async function deInc(action){
     try {
       const res = await fetch(`http://localhost:3000/counter/${action}`, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
       if(!res.ok) throw new Error('Failed to update counter');
       const data = await res.json()
@@ -56,14 +57,14 @@ export default function App() {
   }
 
   function handleLogout() {
-    sessionStorage.clear()
-    setIsLoggedIn(false)
+    localStorage.removeItem('token');
+    setToken('');
   }
 
   const INCREMENT = 'increment';
   const DECREMENT = 'decrement';
 
-  if(!isLoggedIn) {
+  if(!token) {
     return (
       <div>
         <h2>Login</h2>
