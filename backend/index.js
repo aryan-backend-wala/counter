@@ -13,6 +13,15 @@ app.get('/counter', (req, res) => {
   res.json({ counter })
 })
 
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  if(username === 'admin' && password === "1234") {
+    res.json({ message: "Login Successful"})
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' })
+  }
+})
+
 app.post('/counter/:action', (req, res) => {
   const { action } = req.params;
   if(action === 'increment') {

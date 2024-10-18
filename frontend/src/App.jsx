@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 
 export default function App() {
   const [counter, setCounter] = useState(0);
-  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
   useEffect(() => {
     async function fetchCounter(){
       try{
@@ -13,8 +16,25 @@ export default function App() {
         console.error('Error fetching counter: ', err)
       }
     }
-    fetchCounter()
-  }, [])
+    if(isLoggedIn) {
+      fetchCounter()
+    }
+  }, [isLoggedIn])
+
+  const handleLogin = async () => {
+    const res = await fetch("http://localhost:3000/login", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    })
+    
+    const msg = await res.json();
+    if(res.ok) {
+      setIsLoggedIn(true)
+    } else {
+      alert(msg.message)
+    }
+  }
 
   async function deInc(action){
     try {
@@ -32,6 +52,17 @@ export default function App() {
 
   const INCREMENT = 'increment';
   const DECREMENT = 'decrement';
+
+  if(!isLoggedIn) {
+    return (
+      <div>
+        <h2>Login</h2>
+        <input placeholder="Username" onChange={(e) => setUsername(e.target.value)} />
+        <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} />
+        <button onClick={handleLogin}>Login</button>
+      </div>
+    )
+  }
 
   return (
     <div>
