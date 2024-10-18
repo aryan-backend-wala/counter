@@ -18,14 +18,8 @@ export default function App() {
 
   async function deInc(action){
     try {
-      const res = await fetch("http://localhost:3000/counter/action", {
-        method: 'POST',
-        body: JSON.stringify({
-          countFlag: action
-        }),
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const res = await fetch(`http://localhost:3000/counter/${action}`, {
+        method: 'POST'
       })
       if(!res.ok) throw new Error('Failed to update counter');
       const data = await res.json()
@@ -36,8 +30,8 @@ export default function App() {
     }
   }
 
-  const INCREMENT = 1;
-  const DECREMENT = 0;
+  const INCREMENT = 'increment';
+  const DECREMENT = 'decrement';
 
   return (
     <div>

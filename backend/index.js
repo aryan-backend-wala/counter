@@ -10,20 +10,19 @@ app.use(express.json())
 let counter = 0;
 
 app.get('/counter', (req, res) => {
-  res.json({ counter: counter })
+  res.json({ counter })
 })
 
-app.post('/counter/action', (req, res) => {
-  const { countFlag } = req.body;
-  const flag = parseInt(countFlag);
-  if(flag === 1) {
+app.post('/counter/:action', (req, res) => {
+  const { action } = req.params;
+  if(action === 'increment') {
     counter += 1;
-  } else if(flag === 0) {
+  } else if(action === 'decrement') {
     counter -= 1;
   } else {
     return res.status(400).json({ message: 'Invalid CountFlag'})
   }
-  res.json({ message: `${flag === 1 ? 'Increment' : 'Decrement'}`, counter })
+  res.json({ message: `${action} Successful`, counter })
 })
 
 
